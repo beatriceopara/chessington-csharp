@@ -15,7 +15,7 @@ namespace Chessington.GameEngine.Tests.Pieces
             board.AddPiece(Square.At(4, 0), pawn);
 
             var moves = pawn.GetAvailableMoves(board);
-
+            
             moves.Should().Contain(Square.At(3, 0));
         }
 
@@ -27,7 +27,7 @@ namespace Chessington.GameEngine.Tests.Pieces
             board.AddPiece(Square.At(4, 0), pawn);
 
             var moves = pawn.GetAvailableMoves(board);
-
+            
             moves.Should().Contain(Square.At(5, 0));
         }
     }
