@@ -1,7 +1,9 @@
 ﻿﻿using System.Collections.Generic;
 using System.Linq;
+ using System.Runtime.InteropServices.WindowsRuntime;
+ using System.Transactions;
 
-namespace Chessington.GameEngine.Pieces
+ namespace Chessington.GameEngine.Pieces
 {
     public class Pawn : Piece
     {
@@ -10,43 +12,59 @@ namespace Chessington.GameEngine.Pieces
 
         public override IEnumerable<Square> GetAvailableMoves(Board board)
         {
-            var square = board.FindPiece(this);
+            var currentLocation = board.FindPiece(this);
 
-            var row = square.Row;
+            var currentRow = currentLocation.Row;
 
-            var col = square.Col;
-
-            //if player == black 
-            //if play hasn't move 
-            //Square + 2 
-            //else Square + 1
+            var currentCol = currentLocation.Col;
             
-            //if player = white
-            //if play hasn't move 
-            //Square + 2 
-            //else Square + 1
-            
-            //else player == white
-            List<Square> squares = new List<Square>();
+            List<Square> squaresToMoveTo = new List<Square>();
+
+            Square nextSquare;
+            Square secondNextSquare;
             
             if (Player == Player.Black)
             {
-                squares.Add(Square.At(row + 1, col));
-                if (!HasPlayMoved(row))
+               nextSquare = Square.At(currentRow + 1 , currentCol);
+               secondNextSquare = Square.At(currentRow + 2, currentCol);
+            }
+            else
+            {
+               nextSquare = Square.At(currentRow - 1, currentCol);
+               secondNextSquare = Square.At(currentRow - 2, currentCol);
+            }
+            
+            if (HasPlayMoved(currentRow))
+            {
+                if (IsSquareFree(board, nextSquare))
                 {
-                    squares.Add(Square.At(row + 2, col) );
-                   
+                    squaresToMoveTo.Add(nextSquare);
+                }
+                else
+                {
+                    //don't add moves 
                 }
             }
             else
             {
-                squares.Add(Square.At(row - 1, col));
-                if (!HasPlayMoved(row))
+                if (IsSquareFree(board, nextSquare))
                 {
-                    squares.Add(Square.At(row - 2, col));
+                    if (IsSquareFree(board, secondNextSquare))
+                    {
+                        squaresToMoveTo.Add(nextSquare);
+                        squaresToMoveTo.Add(secondNextSquare);
+                    }
+                    else
+                    {
+                        squaresToMoveTo.Add(nextSquare);
+                    }
+                }
+                else
+                {
+                    //don't add moves
                 }
             }
-            return squares;
+            return squaresToMoveTo;
         }
 
         private bool HasPlayMoved(int row)
@@ -59,12 +77,24 @@ namespace Chessington.GameEngine.Pieces
             {
                 return row != 6;
             }
-            //if player == black 
-            //if play hasn't move 
-            //Square + 2 (return false)
-            //else Square + 1 (return true)
-            //return square 
-            //origin == 1,0 or origin == 6,0
+        }
+        
+        //if player1 is blocked by player 2 the piece cannot move forward and it cannot take the piece in front 
+        //needs to check if square on board is free or check if piece in square
+        
+        //if piece in square return true
+        //else no piece in square return false
+        private bool IsSquareFree(Board board, Square square)
+        {
+
+            if (board.GetPiece(square) == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
